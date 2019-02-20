@@ -33,7 +33,7 @@ CREATE OR REPLACE PACKAGE BODY sa_csrf IS
                       p_user_data IN VARCHAR2,
                       p_secret    IN VARCHAR2) RETURN VARCHAR2 IS
   BEGIN
-    RETURN dbms_crypto.Hash(p_secret || p_user_data || p_salt, dbms_crypto.HMAC_SH256) || ':' || p_salt;
+    RETURN dbms_crypto.Hash(utl_raw.cast_to_raw(p_secret || p_user_data || p_salt), dbms_crypto.HMAC_SH256) || ':' || p_salt;
   END;
   --===============================================================================
   FUNCTION get_salt(p_token IN VARCHAR2) RETURN VARCHAR2 IS
@@ -54,7 +54,7 @@ CREATE OR REPLACE PACKAGE BODY sa_csrf IS
     l_salt VARCHAR2(14);
   BEGIN
     l_salt := get_salt(p_token);
-    RETURN dbms_crypto.Hash(p_secret || p_user_data || l_salt, dbms_crypto.HMAC_SH256) || ':' || l_salt = p_token;
+    RETURN dbms_crypto.Hash(utl_raw.cast_to_raw(p_secret || p_user_data || l_salt), dbms_crypto.HMAC_SH256) || ':' || l_salt = p_token;
   END;
   --===============================================================================
 END sa_csrf;
